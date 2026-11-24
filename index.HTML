@@ -1,0 +1,835 @@
+<!DOCTYPE html>
+<html lang="es" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DreamCode | Desarrollo de Software a Medida</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Inter & Plus Jakarta Sans -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+    <!-- Font Awesome para iconos limpios -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script>
+        // Configuración personalizada de Tailwind para colores y tipografía
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        display: ['Plus Jakarta Sans', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#eef2ff',
+                            100: '#e0e7ff',
+                            200: '#c7d2fe',
+                            300: '#a5b4fc',
+                            400: '#818cf8',
+                            500: '#6366f1',
+                            600: '#4f46e5',
+                            700: '#4338ca',
+                            800: '#3730a3',
+                            900: '#312e81',
+                            950: '#1e1b4b',
+                        },
+                        accent: {
+                            400: '#22d3ee',
+                            500: '#06b6d4',
+                            600: '#0891b2',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-slate-50 text-slate-800 dark:bg-slate-950 dark:text-slate-100 transition-colors duration-300 antialiased selection:bg-brand-500 selection:text-white overflow-x-hidden">
+
+    <!-- Notificación Toast Flotante (Reemplazo seguro de alert) -->
+    <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col gap-3 pointer-events-none"></div>
+
+    <!-- Barra de Navegación -->
+    <header class="fixed top-0 w-full z-40 bg-white/80 dark:bg-slate-950/80 backdrop-blur-md border-b border-slate-200/70 dark:border-slate-800/70 transition-colors duration-300">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-20">
+                <!-- Logo DreamCode -->
+                <a href="#" class="flex items-center gap-3 group focus:outline-none">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-brand-600 to-accent-500 flex items-center justify-center text-white shadow-lg shadow-brand-500/30 group-hover:scale-105 transition-transform">
+                        <i class="fa-solid fa-code text-lg"></i>
+                    </div>
+                    <span class="font-display font-bold text-2xl tracking-tight text-slate-900 dark:text-white">
+                        Dream<span class="text-brand-600 dark:text-accent-400">Code</span>
+                    </span>
+                </a>
+
+                <!-- Menú Desktop -->
+                <nav class="hidden md:flex items-center gap-8 text-sm font-medium text-slate-600 dark:text-slate-300">
+                    <a href="#nosotros" class="hover:text-brand-600 dark:hover:text-accent-400 transition-colors">Nosotros</a>
+                    <a href="#servicios" class="hover:text-brand-600 dark:hover:text-accent-400 transition-colors">Servicios</a>
+                    <a href="#tecnologias" class="hover:text-brand-600 dark:hover:text-accent-400 transition-colors">Tecnologías</a>
+                    <a href="#portafolio" class="hover:text-brand-600 dark:hover:text-accent-400 transition-colors">Soluciones</a>
+                    <a href="#contacto" class="hover:text-brand-600 dark:hover:text-accent-400 transition-colors">Contacto</a>
+                </nav>
+
+                <!-- Controles: Modo Oscuro/Claro + CTA + Menú Móvil -->
+                <div class="flex items-center gap-3">
+                    <button id="theme-toggle" aria-label="Cambiar tema" class="p-2.5 rounded-xl bg-slate-100 dark:bg-slate-800/80 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors">
+                        <i id="theme-icon" class="fa-solid fa-moon text-base"></i>
+                    </button>
+
+                    <a href="#contacto" class="hidden sm:inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-brand-600 hover:bg-brand-700 text-white font-medium text-sm shadow-md shadow-brand-600/20 transition-all hover:-translate-y-0.5">
+                        <span>Cotizar Proyecto</span>
+                        <i class="fa-solid fa-arrow-right text-xs"></i>
+                    </a>
+
+                    <!-- Botón Hamburguesa Móvil -->
+                    <button id="mobile-menu-btn" aria-label="Abrir menú" class="md:hidden p-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200">
+                        <i class="fa-solid fa-bars text-lg"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Menú Desplegable Móvil -->
+        <div id="mobile-menu" class="hidden md:hidden bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 px-4 pt-2 pb-6 space-y-2 shadow-xl">
+            <a href="#nosotros" class="mobile-link block px-4 py-3 rounded-xl text-base font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800">Nosotros</a>
+            <a href="#servicios" class="mobile-link block px-4 py-3 rounded-xl text-base font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800">Servicios</a>
+            <a href="#tecnologias" class="mobile-link block px-4 py-3 rounded-xl text-base font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800">Tecnologías</a>
+            <a href="#portafolio" class="mobile-link block px-4 py-3 rounded-xl text-base font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800">Soluciones</a>
+            <a href="#contacto" class="mobile-link block px-4 py-3 rounded-xl text-base font-medium bg-brand-600 text-white text-center mt-4">Hablemos de tu idea</a>
+        </div>
+    </header>
+
+    <!-- Sección Hero -->
+    <section class="relative pt-32 pb-20 lg:pt-44 lg:pb-32 overflow-hidden">
+        <!-- Elementos decorativos de fondo -->
+        <div class="absolute inset-0 -z-10 overflow-hidden pointer-events-none">
+            <div class="absolute -top-24 -right-24 w-96 h-96 rounded-full bg-brand-500/15 dark:bg-brand-500/20 blur-3xl"></div>
+            <div class="absolute top-1/2 -left-24 w-80 h-80 rounded-full bg-accent-500/15 dark:bg-accent-500/15 blur-3xl"></div>
+        </div>
+
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid lg:grid-cols-12 gap-12 lg:gap-8 items-center">
+                <!-- Columna Texto Hero -->
+                <div class="lg:col-span-7 text-center lg:text-left">
+                    <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-brand-50 dark:bg-brand-950/80 border border-brand-200 dark:border-brand-800/80 text-brand-700 dark:text-accent-400 text-xs sm:text-sm font-semibold mb-6">
+                        <span class="w-2 h-2 rounded-full bg-accent-500 animate-pulse"></span>
+                        <span>Desarrollo de Software a Medida • México</span>
+                    </div>
+
+                    <h1 class="font-display font-extrabold text-4xl sm:text-5xl lg:text-6xl tracking-tight text-slate-900 dark:text-white leading-[1.15] mb-6">
+                        Transformamos las ideas de tu negocio en <span class="text-transparent bg-clip-text bg-gradient-to-r from-brand-600 via-brand-500 to-accent-500 dark:from-brand-400 dark:to-accent-400">software real y escalable</span>.
+                    </h1>
+
+                    <p class="text-base sm:text-lg text-slate-600 dark:text-slate-300 max-w-2xl mx-auto lg:mx-0 mb-8 leading-relaxed">
+                        En <strong class="text-slate-900 dark:text-white font-semibold">DreamCode</strong> diseñamos y desarrollamos aplicaciones web, sistemas de gestión y apps móviles prácticas para tiendas, clínicas, emprendedores y empresas que buscan digitalizarse sin complicaciones.
+                    </p>
+
+                    <div class="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4">
+                        <a href="#contacto" class="w-full sm:w-auto px-7 py-4 rounded-2xl bg-brand-600 hover:bg-brand-700 text-white font-semibold text-base shadow-xl shadow-brand-600/25 transition-all hover:-translate-y-0.5 flex items-center justify-center gap-2">
+                            <span>Iniciar mi proyecto</span>
+                            <i class="fa-solid fa-rocket text-sm"></i>
+                        </a>
+                        <a href="#portafolio" class="w-full sm:w-auto px-7 py-4 rounded-2xl bg-white dark:bg-slate-900 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-800 dark:text-slate-200 font-semibold text-base border border-slate-200 dark:border-slate-800 transition-all flex items-center justify-center gap-2">
+                            <span>Ver soluciones</span>
+                            <i class="fa-solid fa-layer-group text-sm text-brand-500"></i>
+                        </a>
+                    </div>
+
+                    <!-- Indicadores de confianza rápidos -->
+                    <div class="mt-10 pt-8 border-t border-slate-200/80 dark:border-slate-800/80 grid grid-cols-3 gap-4 max-w-lg mx-auto lg:mx-0">
+                        <div>
+                            <p class="font-display font-bold text-2xl sm:text-3xl text-slate-900 dark:text-white">100%</p>
+                            <p class="text-xs sm:text-sm text-slate-500 dark:text-slate-400">Código a medida</p>
+                        </div>
+                        <div>
+                            <p class="font-display font-bold text-2xl sm:text-3xl text-slate-900 dark:text-white">Full-Stack</p>
+                            <p class="text-xs sm:text-sm text-slate-500 dark:text-slate-400">Web, Móvil y Nube</p>
+                        </div>
+                        <div>
+                            <p class="font-display font-bold text-2xl sm:text-3xl text-slate-900 dark:text-white">Directo</p>
+                            <p class="text-xs sm:text-sm text-slate-500 dark:text-slate-400">Trato sin intermediarios</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Columna Visual: Mockup de Interfaz / Código -->
+                <div class="lg:col-span-5">
+                    <div class="relative mx-auto max-w-md lg:max-w-none">
+                        <!-- Tarjeta principal estilo IDE / Dashboard -->
+                        <div class="rounded-3xl bg-slate-900 border border-slate-800 shadow-2xl overflow-hidden text-slate-300">
+                            <!-- Barra superior de ventana -->
+                            <div class="px-5 py-3.5 bg-slate-950 border-b border-slate-800 flex items-center justify-between">
+                                <div class="flex items-center gap-2">
+                                    <span class="w-3 h-3 rounded-full bg-rose-500"></span>
+                                    <span class="w-3 h-3 rounded-full bg-amber-400"></span>
+                                    <span class="w-3 h-3 rounded-full bg-emerald-500"></span>
+                                </div>
+                                <span class="text-xs font-mono text-slate-400">dreamcode.solution.ts</span>
+                                <span class="text-xs text-accent-400 font-semibold">Activo</span>
+                            </div>
+                            <!-- Cuerpo simulando arquitectura -->
+                            <div class="p-6 font-mono text-xs sm:text-sm space-y-3 leading-relaxed">
+                                <p><span class="text-purple-400">const</span> <span class="text-accent-400">dreamCode</span> = {</p>
+                                <p class="pl-4">fundador: <span class="text-emerald-400">'Carlos Uriel González'</span>,</p>
+                                <p class="pl-4">enfoque: <span class="text-emerald-400">'Práctico & Escalable'</span>,</p>
+                                <p class="pl-4">sectores: [</p>
+                                <p class="pl-8 text-amber-300">'Negocios Locales', 'Tiendas',</p>
+                                <p class="pl-8 text-amber-300">'Clínicas', 'Servicios'</p>
+                                <p class="pl-4">],</p>
+                                <p class="pl-4">entregarValor: (<span class="text-orange-300">idea</span>) => {</p>
+                                <p class="pl-8"><span class="text-purple-400">return</span> <span class="text-brand-400">SoftwareDeAltoImpacto</span>(idea);</p>
+                                <p class="pl-4">}</p>
+                                <p>};</p>
+                            </div>
+                            <!-- Barra inferior de estado -->
+                            <div class="px-6 py-4 bg-slate-800/60 border-t border-slate-800 flex items-center justify-between">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-8 h-8 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center">
+                                        <i class="fa-solid fa-check"></i>
+                                    </div>
+                                    <div>
+                                        <p class="text-xs font-semibold text-white">Listo para producción</p>
+                                        <p class="text-[11px] text-slate-400">Arquitectura limpia y segura</p>
+                                    </div>
+                                </div>
+                                <span class="px-2.5 py-1 rounded-md bg-brand-500/20 text-brand-300 text-xs font-medium">v2.6</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Sección Nosotros -->
+    <section id="nosotros" class="py-20 lg:py-28 bg-white dark:bg-slate-900/60 border-y border-slate-200/70 dark:border-slate-800/70">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid lg:grid-cols-12 gap-12 items-center">
+                <!-- Columna Izquierda: Perfil del Fundador y Valores -->
+                <div class="lg:col-span-5 space-y-6">
+                    <div class="p-6 sm:p-8 rounded-3xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-lg relative overflow-hidden">
+                        <div class="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-brand-500/15 to-transparent rounded-bl-full"></div>
+                        
+                        <div class="flex items-center gap-4 mb-6">
+                            <!-- Avatar con iniciales estilizadas y fallback limpio -->
+                            <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-brand-600 to-accent-500 flex items-center justify-center text-white font-display font-bold text-2xl shadow-md shrink-0">
+                                CG
+                            </div>
+                            <div>
+                                <span class="text-xs font-semibold uppercase tracking-wider text-brand-600 dark:text-accent-400">Fundador & Lead Developer</span>
+                                <h3 class="font-display font-bold text-xl text-slate-900 dark:text-white">Carlos Uriel González</h3>
+                                <p class="text-sm text-slate-500 dark:text-slate-400">Desarrollador Full-Stack & Móvil</p>
+                            </div>
+                        </div>
+
+                        <p class="text-sm sm:text-base text-slate-600 dark:text-slate-300 leading-relaxed mb-6">
+                            "Creamos DreamCode con una convicción clara: la tecnología de primer nivel no debería ser exclusiva de las grandes corporaciones. Nuestro objetivo es acompañar a negocios locales, clínicas y emprendedores con herramientas digitales hechas exactamente a su medida, fáciles de usar y diseñadas para ahorrar tiempo y aumentar ventas."
+                        </p>
+
+                        <div class="flex flex-wrap gap-2">
+                            <span class="px-3 py-1 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs font-medium text-slate-700 dark:text-slate-300">
+                                <i class="fa-solid fa-layer-group text-brand-500 mr-1.5"></i>Arquitectura Full-Stack
+                            </span>
+                            <span class="px-3 py-1 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs font-medium text-slate-700 dark:text-slate-300">
+                                <i class="fa-solid fa-mobile-screen text-accent-500 mr-1.5"></i>Apps Multiplataforma
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Columna Derecha: Misión, Enfoque Práctico y Experiencia -->
+                <div class="lg:col-span-7">
+                    <span class="text-sm font-bold uppercase tracking-wider text-brand-600 dark:text-accent-400">Sobre Nosotros</span>
+                    <h2 class="font-display font-bold text-3xl sm:text-4xl text-slate-900 dark:text-white mt-2 mb-6">
+                        Tecnología con propósito práctico, cercana a tu operación diaria
+                    </h2>
+                    <p class="text-slate-600 dark:text-slate-300 text-base sm:text-lg leading-relaxed mb-8">
+                        En <strong>DreamCode</strong> combinamos ingeniería de software moderna con un entendimiento profundo de cómo operan los negocios reales. No vendemos plantillas genéricas ni funciones innecesarias: escuchamos tu flujo de trabajo y construimos la solución exacta que tu equipo necesita.
+                    </p>
+
+                    <div class="grid sm:grid-cols-2 gap-6">
+                        <!-- Pilar 1 -->
+                        <div class="p-5 rounded-2xl bg-slate-50 dark:bg-slate-900/90 border border-slate-200/80 dark:border-slate-800">
+                            <div class="w-11 h-11 rounded-xl bg-brand-100 dark:bg-brand-950 text-brand-600 dark:text-brand-400 flex items-center justify-center mb-4">
+                                <i class="fa-solid fa-bullseye text-lg"></i>
+                            </div>
+                            <h4 class="font-display font-bold text-lg text-slate-900 dark:text-white mb-2">Nuestra Misión</h4>
+                            <p class="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
+                                Impulsar la transformación digital de comercios locales, clínicas, tiendas y prestadores de servicios mediante software confiable, intuitivo y rentable.
+                            </p>
+                        </div>
+
+                        <!-- Pilar 2 -->
+                        <div class="p-5 rounded-2xl bg-slate-50 dark:bg-slate-900/90 border border-slate-200/80 dark:border-slate-800">
+                            <div class="w-11 h-11 rounded-xl bg-cyan-100 dark:bg-cyan-950 text-cyan-600 dark:text-accent-400 flex items-center justify-center mb-4">
+                                <i class="fa-solid fa-screwdriver-wrench text-lg"></i>
+                            </div>
+                            <h4 class="font-display font-bold text-lg text-slate-900 dark:text-white mb-2">Enfoque Práctico</h4>
+                            <p class="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
+                                Entregas iterativas con avances visibles desde la primera semana, capacitación personalizada y acompañamiento técnico continuo tras el lanzamiento.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Sección Servicios -->
+    <section id="servicios" class="py-20 lg:py-28">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center max-w-3xl mx-auto mb-16">
+                <span class="text-sm font-bold uppercase tracking-wider text-brand-600 dark:text-accent-400">Nuestros Servicios</span>
+                <h2 class="font-display font-bold text-3xl sm:text-4xl text-slate-900 dark:text-white mt-2 mb-4">
+                    Soluciones digitales diseñadas para hacer crecer tu negocio
+                </h2>
+                <p class="text-slate-600 dark:text-slate-300 text-base sm:text-lg">
+                    Desde tu presencia profesional en internet hasta sistemas completos que automatizan tus inventarios, citas y ventas.
+                </p>
+            </div>
+
+            <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8">
+                <!-- Servicio 1: Desarrollo Web a Medida -->
+                <div class="group p-7 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:border-brand-500 dark:hover:border-brand-500 shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col justify-between">
+                    <div>
+                        <div class="w-14 h-14 rounded-2xl bg-brand-50 dark:bg-brand-950/90 text-brand-600 dark:text-brand-400 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                            <i class="fa-solid fa-laptop-code text-2xl"></i>
+                        </div>
+                        <h3 class="font-display font-bold text-xl text-slate-900 dark:text-white mb-3">Desarrollo Web a Medida</h3>
+                        <p class="text-sm text-slate-600 dark:text-slate-400 leading-relaxed mb-6">
+                            Sitios web corporativos, landing pages de alta conversión y plataformas web progresivas rápidas, responsivas y optimizadas para buscadores.
+                        </p>
+                    </div>
+                    <ul class="space-y-2 text-xs font-medium text-slate-600 dark:text-slate-300 pt-4 border-t border-slate-100 dark:border-slate-800">
+                        <li class="flex items-center gap-2"><i class="fa-solid fa-check text-brand-500"></i> Diseño adaptable móvil/desktop</li>
+                        <li class="flex items-center gap-2"><i class="fa-solid fa-check text-brand-500"></i> Paneles autoadministrables</li>
+                    </ul>
+                </div>
+
+                <!-- Servicio 2: Apps Móviles -->
+                <div class="group p-7 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:border-accent-500 dark:hover:border-accent-500 shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col justify-between">
+                    <div>
+                        <div class="w-14 h-14 rounded-2xl bg-cyan-50 dark:bg-cyan-950/90 text-cyan-600 dark:text-accent-400 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                            <i class="fa-solid fa-mobile-screen-button text-2xl"></i>
+                        </div>
+                        <h3 class="font-display font-bold text-xl text-slate-900 dark:text-white mb-3">Apps Móviles</h3>
+                        <p class="text-sm text-slate-600 dark:text-slate-400 leading-relaxed mb-6">
+                            Aplicaciones nativas y multiplataforma para Android e iOS con Flutter. Ideales para pedidos a domicilio, reservas, fidelización y gestión en campo.
+                        </p>
+                    </div>
+                    <ul class="space-y-2 text-xs font-medium text-slate-600 dark:text-slate-300 pt-4 border-t border-slate-100 dark:border-slate-800">
+                        <li class="flex items-center gap-2"><i class="fa-solid fa-check text-accent-500"></i> Android & iOS desde un núcleo</li>
+                        <li class="flex items-center gap-2"><i class="fa-solid fa-check text-accent-500"></i> Notificaciones push y geolocalización</li>
+                    </ul>
+                </div>
+
+                <!-- Servicio 3: Sistemas de Gestión e Inventarios -->
+                <div class="group p-7 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:border-brand-500 dark:hover:border-brand-500 shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col justify-between">
+                    <div>
+                        <div class="w-14 h-14 rounded-2xl bg-indigo-50 dark:bg-indigo-950/90 text-indigo-600 dark:text-indigo-400 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                            <i class="fa-solid fa-boxes-stacked text-2xl"></i>
+                        </div>
+                        <h3 class="font-display font-bold text-xl text-slate-900 dark:text-white mb-3">Sistemas de Gestión e Inventarios</h3>
+                        <p class="text-sm text-slate-600 dark:text-slate-400 leading-relaxed mb-6">
+                            Software administrativo en la nube para control de stock, puntos de venta (POS), expedientes clínicos, agendas de citas y reportes financieros en tiempo real.
+                        </p>
+                    </div>
+                    <ul class="space-y-2 text-xs font-medium text-slate-600 dark:text-slate-300 pt-4 border-t border-slate-100 dark:border-slate-800">
+                        <li class="flex items-center gap-2"><i class="fa-solid fa-check text-indigo-500"></i> Control de entradas, salidas y alertas</li>
+                        <li class="flex items-center gap-2"><i class="fa-solid fa-check text-indigo-500"></i> Roles de usuario y cortes de caja</li>
+                    </ul>
+                </div>
+
+                <!-- Servicio 4: Tiendas en Línea / E-commerce -->
+                <div class="group p-7 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:border-emerald-500 dark:hover:border-emerald-500 shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col justify-between">
+                    <div>
+                        <div class="w-14 h-14 rounded-2xl bg-emerald-50 dark:bg-emerald-950/90 text-emerald-600 dark:text-emerald-400 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                            <i class="fa-solid fa-cart-shopping text-2xl"></i>
+                        </div>
+                        <h3 class="font-display font-bold text-xl text-slate-900 dark:text-white mb-3">Tiendas en Línea / E-commerce</h3>
+                        <p class="text-sm text-slate-600 dark:text-slate-400 leading-relaxed mb-6">
+                            Catálogos digitales interactivos y tiendas completas con pasarelas de pago seguras, gestión de envíos y pedidos integrados directamente a WhatsApp.
+                        </p>
+                    </div>
+                    <ul class="space-y-2 text-xs font-medium text-slate-600 dark:text-slate-300 pt-4 border-t border-slate-100 dark:border-slate-800">
+                        <li class="flex items-center gap-2"><i class="fa-solid fa-check text-emerald-500"></i> Pagos con tarjeta, transferencia y efectivo</li>
+                        <li class="flex items-center gap-2"><i class="fa-solid fa-check text-emerald-500"></i> Sincronización con inventario</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Sección Stack Tecnológico -->
+    <section id="tecnologias" class="py-20 bg-slate-900 text-white relative overflow-hidden">
+        <div class="absolute inset-0 bg-[radial-gradient(circle_at_top_right,_var(--tw-gradient-stops))] from-brand-900/40 via-slate-900 to-slate-950 pointer-events-none"></div>
+        
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            <div class="text-center max-w-3xl mx-auto mb-14">
+                <span class="text-sm font-bold uppercase tracking-wider text-accent-400">Stack Tecnológico</span>
+                <h2 class="font-display font-bold text-3xl sm:text-4xl text-white mt-2 mb-4">
+                    Herramientas modernas, probadas y de alto rendimiento
+                </h2>
+                <p class="text-slate-300 text-base sm:text-lg">
+                    Seleccionamos las tecnologías más sólidas de la industria para garantizar que tu sistema sea veloz, seguro y fácil de mantener a futuro.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 sm:gap-6">
+                <!-- Angular -->
+                <div class="p-6 rounded-2xl bg-slate-800/60 border border-slate-700/70 hover:border-rose-500/70 hover:bg-slate-800 transition-all text-center group">
+                    <div class="w-12 h-12 mx-auto rounded-xl bg-rose-500/15 text-rose-400 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+                        <i class="fa-brands fa-angular text-2xl"></i>
+                    </div>
+                    <h3 class="font-display font-bold text-base text-white">Angular</h3>
+                    <p class="text-xs text-slate-400 mt-1">Frontend Empresarial</p>
+                </div>
+
+                <!-- Node.js -->
+                <div class="p-6 rounded-2xl bg-slate-800/60 border border-slate-700/70 hover:border-emerald-500/70 hover:bg-slate-800 transition-all text-center group">
+                    <div class="w-12 h-12 mx-auto rounded-xl bg-emerald-500/15 text-emerald-400 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+                        <i class="fa-brands fa-node-js text-2xl"></i>
+                    </div>
+                    <h3 class="font-display font-bold text-base text-white">Node.js</h3>
+                    <p class="text-xs text-slate-400 mt-1">APIs & Tiempo Real</p>
+                </div>
+
+                <!-- Laravel -->
+                <div class="p-6 rounded-2xl bg-slate-800/60 border border-slate-700/70 hover:border-red-500/70 hover:bg-slate-800 transition-all text-center group">
+                    <div class="w-12 h-12 mx-auto rounded-xl bg-red-500/15 text-red-400 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+                        <i class="fa-brands fa-laravel text-2xl"></i>
+                    </div>
+                    <h3 class="font-display font-bold text-base text-white">Laravel</h3>
+                    <p class="text-xs text-slate-400 mt-1">Backend Robusto</p>
+                </div>
+
+                <!-- PHP -->
+                <div class="p-6 rounded-2xl bg-slate-800/60 border border-slate-700/70 hover:border-indigo-400/70 hover:bg-slate-800 transition-all text-center group">
+                    <div class="w-12 h-12 mx-auto rounded-xl bg-indigo-500/15 text-indigo-300 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+                        <i class="fa-brands fa-php text-2xl"></i>
+                    </div>
+                    <h3 class="font-display font-bold text-base text-white">PHP</h3>
+                    <p class="text-xs text-slate-400 mt-1">Sistemas Web Ágiles</p>
+                </div>
+
+                <!-- MySQL -->
+                <div class="p-6 rounded-2xl bg-slate-800/60 border border-slate-700/70 hover:border-amber-400/70 hover:bg-slate-800 transition-all text-center group">
+                    <div class="w-12 h-12 mx-auto rounded-xl bg-amber-500/15 text-amber-400 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+                        <i class="fa-solid fa-database text-2xl"></i>
+                    </div>
+                    <h3 class="font-display font-bold text-base text-white">MySQL</h3>
+                    <p class="text-xs text-slate-400 mt-1">Bases de Datos Seguras</p>
+                </div>
+
+                <!-- Flutter -->
+                <div class="p-6 rounded-2xl bg-slate-800/60 border border-slate-700/70 hover:border-sky-400/70 hover:bg-slate-800 transition-all text-center group">
+                    <div class="w-12 h-12 mx-auto rounded-xl bg-sky-500/15 text-sky-400 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+                        <i class="fa-solid fa-mobile-screen text-2xl"></i>
+                    </div>
+                    <h3 class="font-display font-bold text-base text-white">Flutter</h3>
+                    <p class="text-xs text-slate-400 mt-1">Apps Android e iOS</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Sección Portafolio de Soluciones Destacadas -->
+    <section id="portafolio" class="py-20 lg:py-28 bg-white dark:bg-slate-900/40">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-6">
+                <div>
+                    <span class="text-sm font-bold uppercase tracking-wider text-brand-600 dark:text-accent-400">Soluciones Destacadas</span>
+                    <h2 class="font-display font-bold text-3xl sm:text-4xl text-slate-900 dark:text-white mt-2">
+                        Casos de uso y arquitecturas listas para adaptarse
+                    </h2>
+                </div>
+
+                <!-- Filtros interactivos del portafolio -->
+                <div class="flex flex-wrap gap-2" id="portfolio-filters">
+                    <button data-filter="all" class="filter-btn active px-4 py-2 rounded-xl text-sm font-semibold bg-brand-600 text-white transition-colors">Todos</button>
+                    <button data-filter="web" class="filter-btn px-4 py-2 rounded-xl text-sm font-semibold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors">Sistemas Web</button>
+                    <button data-filter="movil" class="filter-btn px-4 py-2 rounded-xl text-sm font-semibold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors">Apps Móviles</button>
+                    <button data-filter="ecommerce" class="filter-btn px-4 py-2 rounded-xl text-sm font-semibold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors">E-commerce</button>
+                </div>
+            </div>
+
+            <!-- Grid de Proyectos -->
+            <div class="grid md:grid-cols-3 gap-8" id="portfolio-grid">
+                <!-- Proyecto 1: Clínica -->
+                <article data-category="web" class="portfolio-card rounded-3xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col">
+                    <div class="h-48 bg-gradient-to-br from-brand-600 to-indigo-800 p-6 flex flex-col justify-between text-white relative overflow-hidden">
+                        <i class="fa-solid fa-stethoscope text-7xl text-white/10 absolute -bottom-2 -right-2"></i>
+                        <span class="self-start px-3 py-1 rounded-full bg-white/20 backdrop-blur-sm text-xs font-semibold">Sector Salud & Clínicas</span>
+                        <h3 class="font-display font-bold text-xl">MediControl Agenda & Expedientes</h3>
+                    </div>
+                    <div class="p-6 flex-1 flex flex-col justify-between">
+                        <div>
+                            <p class="text-sm text-slate-600 dark:text-slate-300 leading-relaxed mb-4">
+                                Plataforma web integral para consultorios y clínicas locales. Permite agendar citas con recordatorios automáticos, gestionar historiales clínicos digitales y controlar cobros de consultas.
+                            </p>
+                            <div class="flex flex-wrap gap-1.5 mb-6">
+                                <span class="px-2.5 py-1 rounded-md bg-slate-200/70 dark:bg-slate-800 text-xs font-medium">Angular</span>
+                                <span class="px-2.5 py-1 rounded-md bg-slate-200/70 dark:bg-slate-800 text-xs font-medium">Laravel</span>
+                                <span class="px-2.5 py-1 rounded-md bg-slate-200/70 dark:bg-slate-800 text-xs font-medium">MySQL</span>
+                            </div>
+                        </div>
+                        <a href="#contacto" onclick="selectProjectTopic('Sistema para Clínica / Consultorio')" class="inline-flex items-center gap-2 text-sm font-semibold text-brand-600 dark:text-accent-400 hover:underline">
+                            <span>Solicitar demo similar</span>
+                            <i class="fa-solid fa-arrow-right text-xs"></i>
+                        </a>
+                    </div>
+                </article>
+
+                <!-- Proyecto 2: Inventarios & Punto de Venta -->
+                <article data-category="web ecommerce" class="portfolio-card rounded-3xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col">
+                    <div class="h-48 bg-gradient-to-br from-cyan-600 to-teal-800 p-6 flex flex-col justify-between text-white relative overflow-hidden">
+                        <i class="fa-solid fa-store text-7xl text-white/10 absolute -bottom-2 -right-2"></i>
+                        <span class="self-start px-3 py-1 rounded-full bg-white/20 backdrop-blur-sm text-xs font-semibold">Comercio & Retail</span>
+                        <h3 class="font-display font-bold text-xl">StockFlow POS + Tienda Web</h3>
+                    </div>
+                    <div class="p-6 flex-1 flex flex-col justify-between">
+                        <div>
+                            <p class="text-sm text-slate-600 dark:text-slate-300 leading-relaxed mb-4">
+                                Sistema híbrido de punto de venta en sucursal sincronizado en tiempo real con catálogo online. Controla existencias por código de barras, proveedores y pedidos para recoger o envío local.
+                            </p>
+                            <div class="flex flex-wrap gap-1.5 mb-6">
+                                <span class="px-2.5 py-1 rounded-md bg-slate-200/70 dark:bg-slate-800 text-xs font-medium">Node.js</span>
+                                <span class="px-2.5 py-1 rounded-md bg-slate-200/70 dark:bg-slate-800 text-xs font-medium">PHP</span>
+                                <span class="px-2.5 py-1 rounded-md bg-slate-200/70 dark:bg-slate-800 text-xs font-medium">MySQL</span>
+                            </div>
+                        </div>
+                        <a href="#contacto" onclick="selectProjectTopic('Sistema de Inventarios / Tienda en Línea')" class="inline-flex items-center gap-2 text-sm font-semibold text-brand-600 dark:text-accent-400 hover:underline">
+                            <span>Solicitar demo similar</span>
+                            <i class="fa-solid fa-arrow-right text-xs"></i>
+                        </a>
+                    </div>
+                </article>
+
+                <!-- Proyecto 3: App Móvil de Servicios -->
+                <article data-category="movil" class="portfolio-card rounded-3xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col">
+                    <div class="h-48 bg-gradient-to-br from-slate-800 to-brand-900 p-6 flex flex-col justify-between text-white relative overflow-hidden">
+                        <i class="fa-solid fa-truck-fast text-7xl text-white/10 absolute -bottom-2 -right-2"></i>
+                        <span class="self-start px-3 py-1 rounded-full bg-white/20 backdrop-blur-sm text-xs font-semibold">Servicios & Logística</span>
+                        <h3 class="font-display font-bold text-xl">RutaExpress App de Pedidos</h3>
+                    </div>
+                    <div class="p-6 flex-1 flex flex-col justify-between">
+                        <div>
+                            <p class="text-sm text-slate-600 dark:text-slate-300 leading-relaxed mb-4">
+                                Aplicación móvil para clientes y repartidores/técnicos en campo. Permite solicitar servicios, rastrear estatus en tiempo real, emitir comprobantes digitales y recibir notificaciones.
+                            </p>
+                            <div class="flex flex-wrap gap-1.5 mb-6">
+                                <span class="px-2.5 py-1 rounded-md bg-slate-200/70 dark:bg-slate-800 text-xs font-medium">Flutter</span>
+                                <span class="px-2.5 py-1 rounded-md bg-slate-200/70 dark:bg-slate-800 text-xs font-medium">Node.js</span>
+                                <span class="px-2.5 py-1 rounded-md bg-slate-200/70 dark:bg-slate-800 text-xs font-medium">API REST</span>
+                            </div>
+                        </div>
+                        <a href="#contacto" onclick="selectProjectTopic('Aplicación Móvil a Medida')" class="inline-flex items-center gap-2 text-sm font-semibold text-brand-600 dark:text-accent-400 hover:underline">
+                            <span>Solicitar demo similar</span>
+                            <i class="fa-solid fa-arrow-right text-xs"></i>
+                        </a>
+                    </div>
+                </article>
+            </div>
+        </div>
+    </section>
+
+    <!-- Sección Contacto Interactivo & WhatsApp -->
+    <section id="contacto" class="py-20 lg:py-28 border-t border-slate-200/70 dark:border-slate-800/70">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-2xl overflow-hidden">
+                <div class="grid lg:grid-cols-12">
+                    <!-- Panel Izquierdo de Información y WhatsApp Directo -->
+                    <div class="lg:col-span-5 bg-gradient-to-br from-brand-700 via-brand-800 to-slate-900 p-8 sm:p-12 text-white flex flex-col justify-between">
+                        <div>
+                            <span class="inline-block px-3 py-1 rounded-full bg-white/15 text-accent-300 text-xs font-semibold mb-4">
+                                Hablemos hoy mismo
+                            </span>
+                            <h2 class="font-display font-bold text-3xl sm:text-4xl mb-4 leading-tight">
+                                ¿Listo para digitalizar tu negocio?
+                            </h2>
+                            <p class="text-brand-100 text-sm sm:text-base leading-relaxed mb-8">
+                                Cuéntanos qué necesitas resolver en tu tienda, clínica o empresa. Te asesoramos sin compromiso y preparamos una propuesta clara adaptada a tu presupuesto.
+                            </p>
+
+                            <!-- Botón Directo a WhatsApp -->
+                            <div class="p-5 rounded-2xl bg-white/10 backdrop-blur-md border border-white/15 mb-8">
+                                <p class="text-xs uppercase tracking-wider text-accent-300 font-semibold mb-2">Respuesta rápida por mensaje</p>
+                                <p class="text-sm text-white/90 mb-4">Inicia una conversación directa con nuestro equipo vía WhatsApp.</p>
+                                <a id="direct-whatsapp-btn" href="https://wa.me/5210000000000?text=Hola%20DreamCode%2C%20me%20interesa%20cotizar%20un%20proyecto%20de%20software%20para%20mi%20negocio." target="_blank" rel="noopener noreferrer" class="w-full py-3.5 px-5 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-semibold text-sm shadow-lg shadow-emerald-950/30 transition-all flex items-center justify-center gap-2.5">
+                                    <i class="fa-brands fa-whatsapp text-xl"></i>
+                                    <span>Chatear por WhatsApp</span>
+                                </a>
+                            </div>
+                        </div>
+
+                        <div class="space-y-4 text-sm text-brand-100 pt-6 border-t border-white/15">
+                            <div class="flex items-center gap-3">
+                                <i class="fa-solid fa-user-tie text-accent-400 w-5"></i>
+                                <span>Atención directa: <strong>Carlos Uriel González</strong></span>
+                            </div>
+                            <div class="flex items-center gap-3">
+                                <i class="fa-solid fa-envelope text-accent-400 w-5"></i>
+                                <button type="button" onclick="copyEmail()" class="hover:text-white underline decoration-dotted text-left">
+                                    contacto@dreamcode.mx <span class="text-xs opacity-75">(clic para copiar)</span>
+                                </button>
+                            </div>
+                            <div class="flex items-center gap-3">
+                                <i class="fa-solid fa-location-dot text-accent-400 w-5"></i>
+                                <span>Estado de México / Proyectos remotos a todo México</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Panel Derecho: Formulario Interactivo -->
+                    <div class="lg:col-span-7 p-8 sm:p-12">
+                        <h3 class="font-display font-bold text-2xl text-slate-900 dark:text-white mb-2">Envíanos los detalles de tu proyecto</h3>
+                        <p class="text-sm text-slate-500 dark:text-slate-400 mb-6">Completa el formulario y puedes enviarlo directamente a nuestro WhatsApp con un clic.</p>
+
+                        <form id="contact-form" class="space-y-5">
+                            <div class="grid sm:grid-cols-2 gap-5">
+                                <div>
+                                    <label for="name" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Tu nombre *</label>
+                                    <input type="text" id="name" name="name" required placeholder="Ej. Laura Martínez" class="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-brand-500 focus:border-transparent outline-none transition-all">
+                                </div>
+                                <div>
+                                    <label for="business" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Negocio o empresa</label>
+                                    <input type="text" id="business" name="business" placeholder="Ej. Clínica Dental Sonrisa" class="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-brand-500 focus:border-transparent outline-none transition-all">
+                                </div>
+                            </div>
+
+                            <div class="grid sm:grid-cols-2 gap-5">
+                                <div>
+                                    <label for="service" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Tipo de solución *</label>
+                                    <select id="service" name="service" class="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-brand-500 focus:border-transparent outline-none transition-all">
+                                        <option value="Desarrollo Web a Medida">Desarrollo Web a Medida</option>
+                                        <option value="Sistema de Gestión e Inventarios">Sistema de Gestión e Inventarios</option>
+                                        <option value="Tienda en Línea / E-commerce">Tienda en Línea / E-commerce</option>
+                                        <option value="Aplicación Móvil (Android / iOS)">Aplicación Móvil (Android / iOS)</option>
+                                        <option value="Consultoría / Otro proyecto">Consultoría / Otro proyecto</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label for="contact-info" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Teléfono o Correo *</label>
+                                    <input type="text" id="contact-info" name="contact-info" required placeholder="Ej. 55 1234 5678" class="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-brand-500 focus:border-transparent outline-none transition-all">
+                                </div>
+                            </div>
+
+                            <div>
+                                <label for="message" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Cuéntanos sobre tu idea *</label>
+                                <textarea id="message" name="message" rows="4" required placeholder="Describe brevemente qué te gustaría automatizar, vender o mejorar en tu negocio..." class="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-brand-500 focus:border-transparent outline-none transition-all resize-none"></textarea>
+                            </div>
+
+                            <div class="flex flex-col sm:flex-row gap-3 pt-2">
+                                <button type="submit" class="flex-1 py-3.5 px-6 rounded-xl bg-brand-600 hover:bg-brand-700 text-white font-semibold text-sm sm:text-base shadow-lg shadow-brand-600/25 transition-all flex items-center justify-center gap-2">
+                                    <i class="fa-solid fa-paper-plane"></i>
+                                    <span>Enviar solicitud</span>
+                                </button>
+                                <button type="button" id="send-form-whatsapp" class="py-3.5 px-6 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-sm sm:text-base transition-all flex items-center justify-center gap-2">
+                                    <i class="fa-brands fa-whatsapp text-lg"></i>
+                                    <span>Enviar por WhatsApp</span>
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-slate-950 text-slate-400 py-12 border-t border-slate-900">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-6">
+            <div class="flex items-center gap-3">
+                <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-brand-600 to-accent-500 flex items-center justify-center text-white">
+                    <i class="fa-solid fa-code text-sm"></i>
+                </div>
+                <span class="font-display font-bold text-xl text-white">
+                    Dream<span class="text-accent-400">Code</span>
+                </span>
+            </div>
+
+            <p class="text-xs sm:text-sm text-center sm:text-left">
+                © 2026 DreamCode — Fundado por Carlos Uriel González. Todos los derechos reservados.
+            </p>
+
+            <div class="flex items-center gap-4">
+                <a href="#nosotros" class="text-xs hover:text-white transition-colors">Nosotros</a>
+                <a href="#servicios" class="text-xs hover:text-white transition-colors">Servicios</a>
+                <a href="#contacto" class="text-xs hover:text-white transition-colors">Contacto</a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Botón Flotante de WhatsApp (Móvil y Desktop) -->
+    <a href="https://wa.me/5210000000000?text=Hola%20DreamCode%2C%20me%20gustar%C3%ADa%20recibir%20informaci%C3%B3n%20sobre%20desarrollo%20de%20software." target="_blank" rel="noopener noreferrer" aria-label="Contactar por WhatsApp" class="fixed bottom-6 left-6 z-40 w-14 h-14 rounded-full bg-emerald-500 hover:bg-emerald-600 text-white shadow-xl shadow-emerald-600/30 flex items-center justify-center transition-transform hover:scale-110">
+        <i class="fa-brands fa-whatsapp text-3xl"></i>
+    </a>
+
+    <!-- Lógica JavaScript Interactiva -->
+    <script>
+        // Número de WhatsApp configurable (reemplazar con el número real de DreamCode con código de país)
+        const WHATSAPP_PHONE = '5210000000000';
+
+        // Sistema de Notificaciones Toast (Sin alert())
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            
+            const bgColor = type === 'success' 
+                ? 'bg-slate-900 dark:bg-slate-800 border-emerald-500 text-white' 
+                : 'bg-rose-950 border-rose-500 text-white';
+            const icon = type === 'success' 
+                ? '<i class="fa-solid fa-circle-check text-emerald-400 text-lg"></i>' 
+                : '<i class="fa-solid fa-circle-exclamation text-rose-400 text-lg"></i>';
+
+            toast.className = `pointer-events-auto flex items-center gap-3 px-5 py-4 rounded-2xl border-l-4 shadow-2xl transform transition-all duration-300 translate-y-4 opacity-0 max-w-sm ${bgColor}`;
+            toast.innerHTML = `
+                ${icon}
+                <p class="text-sm font-medium leading-snug">${message}</p>
+            `;
+
+            container.appendChild(toast);
+
+            // Animación de entrada
+            requestAnimationFrame(() => {
+                toast.classList.remove('translate-y-4', 'opacity-0');
+            });
+
+            // Auto-cierre después de 4.5 segundos
+            setTimeout(() => {
+                toast.classList.add('translate-y-4', 'opacity-0');
+                setTimeout(() => toast.remove(), 300);
+            }, 4500);
+        }
+
+        // Control de Tema Claro / Oscuro
+        const themeToggleBtn = document.getElementById('theme-toggle');
+        const themeIcon = document.getElementById('theme-icon');
+        const htmlElement = document.documentElement;
+
+        // Iniciar con tema oscuro por defecto para estética tecnológica o respetar preferencia guardada
+        const savedTheme = localStorage.getItem('dreamcode-theme');
+        if (savedTheme === 'light') {
+            htmlElement.classList.remove('dark');
+            themeIcon.classList.replace('fa-sun', 'fa-moon');
+        } else {
+            htmlElement.classList.add('dark');
+            themeIcon.classList.replace('fa-moon', 'fa-sun');
+        }
+
+        themeToggleBtn.addEventListener('click', () => {
+            htmlElement.classList.toggle('dark');
+            const isDark = htmlElement.classList.contains('dark');
+            localStorage.setItem('dreamcode-theme', isDark ? 'dark' : 'light');
+            
+            if (isDark) {
+                themeIcon.classList.replace('fa-moon', 'fa-sun');
+            } else {
+                themeIcon.classList.replace('fa-sun', 'fa-moon');
+            }
+        });
+
+        // Menú Móvil
+        const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+        const mobileMenu = document.getElementById('mobile-menu');
+        const mobileLinks = document.querySelectorAll('.mobile-link');
+
+        mobileMenuBtn.addEventListener('click', () => {
+            mobileMenu.classList.toggle('hidden');
+        });
+
+        mobileLinks.forEach(link => {
+            link.addEventListener('click', () => {
+                mobileMenu.classList.add('hidden');
+            });
+        });
+
+        // Filtro de Portafolio
+        const filterButtons = document.querySelectorAll('.filter-btn');
+        const portfolioCards = document.querySelectorAll('.portfolio-card');
+
+        filterButtons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                // Actualizar estilos activos de los botones
+                filterButtons.forEach(b => {
+                    b.classList.remove('bg-brand-600', 'text-white');
+                    b.classList.add('bg-slate-100', 'dark:bg-slate-800', 'text-slate-600', 'dark:text-slate-300');
+                });
+                btn.classList.remove('bg-slate-100', 'dark:bg-slate-800', 'text-slate-600', 'dark:text-slate-300');
+                btn.classList.add('bg-brand-600', 'text-white');
+
+                const filter = btn.getAttribute('data-filter');
+
+                portfolioCards.forEach(card => {
+                    const categories = card.getAttribute('data-category');
+                    if (filter === 'all' || categories.includes(filter)) {
+                        card.classList.remove('hidden');
+                    } else {
+                        card.classList.add('hidden');
+                    }
+                });
+            });
+        });
+
+        // Pre-seleccionar tema en el formulario desde las tarjetas del portafolio
+        function selectProjectTopic(topic) {
+            const messageInput = document.getElementById('message');
+            messageInput.value = `Hola DreamCode, me interesa desarrollar una solución similar a: ${topic}. Me gustaría conocer tiempos y costos estimados.`;
+        }
+
+        // Copiar correo al portapapeles de forma segura
+        function copyEmail() {
+            const email = 'contacto@dreamcode.mx';
+            const tempInput = document.createElement('input');
+            tempInput.value = email;
+            document.body.appendChild(tempInput);
+            tempInput.select();
+            try {
+                document.execCommand('copy');
+                showToast('Correo contacto@dreamcode.mx copiado al portapapeles.');
+            } catch (err) {
+                showToast('No se pudo copiar automáticamente: contacto@dreamcode.mx', 'error');
+            }
+            document.body.removeChild(tempInput);
+        }
+
+        // Manejo del Formulario de Contacto y Envío a WhatsApp
+        const contactForm = document.getElementById('contact-form');
+        const sendWhatsAppBtn = document.getElementById('send-form-whatsapp');
+
+        contactForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const name = document.getElementById('name').value.trim();
+            if (!name) return;
+
+            showToast(`¡Gracias ${name}! Hemos recibido tu solicitud en DreamCode. Carlos se pondrá en contacto contigo muy pronto.`);
+            contactForm.reset();
+        });
+
+        sendWhatsAppBtn.addEventListener('click', () => {
+            const name = document.getElementById('name').value.trim();
+            const business = document.getElementById('business').value.trim();
+            const service = document.getElementById('service').value;
+            const message = document.getElementById('message').value.trim();
+
+            if (!name || !message) {
+                showToast('Por favor escribe tu nombre y una breve descripción de tu proyecto antes de abrir WhatsApp.', 'error');
+                return;
+            }
+
+            const text = `Hola *DreamCode*, soy *${name}*${business ? ` de *${business}*` : ''}.\n\nMe interesa: *${service}*.\nDetalles: ${message}`;
+            const encodedText = encodeURIComponent(text);
+            const whatsappUrl = `https://wa.me/${WHATSAPP_PHONE}?text=${encodedText}`;
+
+            window.open(whatsappUrl, '_blank', 'noopener,noreferrer');
+            showToast('Abriendo WhatsApp con los detalles de tu proyecto...');
+        });
+    </script>
+</body>
+</html>
